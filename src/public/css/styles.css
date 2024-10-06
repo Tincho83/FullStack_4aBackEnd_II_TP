@@ -1,0 +1,283 @@
+h1 {
+    border-bottom: 5px solid #000000;
+    margin-bottom: 0px;
+}
+
+.product {
+    background-color: aqua;
+}
+
+.CardItem {
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+    border: 3px solid #000000;
+}
+
+.Header {
+    justify-content: center;
+    padding: 8px 8px 8px 8px !important;
+}
+
+.textoCantidad {
+    text-align: left !important;
+    margin-left: 14px !important;
+}
+
+.ImgPic {
+    justify-content: center !important;
+    align-content: center !important;
+    align-items: center !important;
+    display: inline !important;
+    height: 250px;
+    width: 250px;
+    border-radius: 12px;
+}
+
+.cabecera_Enlaces_img {
+    height: 14px;
+    width: 14px;
+}
+
+.Item {
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+}
+
+.ItemCardFooter {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    display: inline !important;
+
+}
+
+.itemButton {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    margin-top: 11px;
+    margin-left: 14px;
+}
+
+.detalleItemButton {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    margin-top: 11px;
+}
+
+.ItemCardText {
+    margin-left: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+.ItemCantText {
+    text-align: left !important;
+    padding-left: 12px !important;
+}
+
+.ItemData {
+    margin-top: 12px !important;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #0e294b;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.cabecera_divEnlacesHorizontales_ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin-left: 10px;
+    justify-content: center;
+}
+
+.cabecera_divEnlacesHorizontales_ul_li {
+    margin-right: 20px;
+}
+
+.cabecera_Enlaces_img_a {
+    text-decoration: none;
+}
+
+.cabecera_Enlaces_img_p {
+    margin: 10;
+    color: rgb(170, 190, 190);
+}
+
+#hhmm {
+    font-size: x-large;
+    color: rgb(184, 29, 29);
+    margin-left: 20px;
+
+}
+
+#product-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.divCardItem {
+    flex: 1 1 300px;
+    max-width: 300px;
+    margin: 10px;
+}
+
+.CardItem {
+    /*max-width: 300px;*/
+    padding: 0;
+}
+
+.diviCartItem {
+    position: relative;
+}
+
+.ItemDataPrice {
+    color: #007BFF;
+    font-size: 24px;
+}
+
+.ItemCardFooter {
+    display: flex;
+    justify-content: space-between;
+    /* Espacia los botones por todo el ancho disponible */
+    gap: 10px;
+    /* Espaciado entre los botones */
+}
+
+.ItemCardFooter button {
+    background-color: rgb(5, 82, 82);
+    font-size: 1.1rem;
+    /* Aumenta el tamaño del texto */
+    padding: 10px 20px;
+    /* Aumenta el tamaño del botón */
+    margin-right: 10px;
+    /* Espaciado entre botones */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    flex: 1;
+    /* Hace que los botones ocupen el mismo espacio */
+    width: 100%;
+}
+
+.ItemCardFooter button:last-child {
+    margin-right: 0;
+    /* Elimina el margen del último botón */
+}
+
+.ItemCardFooter button:hover {
+    background-color: #023132;
+    /* Cambia el color al pasar el ratón */
+}
+
+#title,
+#description,
+#code,
+#price,
+#stock,
+#category {
+    font-size: 1.25rem;
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+label {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+#btnSubmit {
+    font-size: 1.5rem;
+    padding: 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+
+.divFormProd {
+    flex: 1;
+    margin-left: 0px;
+    margin-right: 20px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+hr {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.paginate {
+    display: flex;
+    justify-content: center;
+    /* Centra horizontalmente los elementos */
+    margin-top: 0px;
+    /* Espacio superior opcional */
+
+    align-items: center;
+
+
+}
+
+.paginate a {
+    margin: 0 5px;
+    /* Espacio entre los enlaces */
+    text-decoration: none;
+    /* Elimina el subrayado */
+    color: #007bff;
+    /* Color del texto */
+    font-size: xx-large;
+}
+
+.paginate a:hover {
+    text-decoration: underline;
+    /* Subrayado al pasar el ratón sobre el enlace */
+}
+
+.ItemDataSubtotal {
+    font-size: 2.0rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.pagCurrent {
+    margin: 0 5px;
+    /* Espacio entre los enlaces */
+    text-decoration: none;
+    /* Elimina el subrayado */
+    color: #ff0d00;
+    /* Color del texto */
+    font-size: xx-large;
+}
+
+.product-container{
+    display: flex;
+    height: auto;
+    width: auto;
+
+}
+
+.product-details{
+    height: auto;
+    width: auto;
+
+}

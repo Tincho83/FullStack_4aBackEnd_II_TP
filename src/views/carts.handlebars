@@ -1,0 +1,42 @@
+<p id="DateLastAccess"></p>
+<h1>{{titulo}} {{cartId}}</h1>
+<div class="ItemCardFooter">
+    <button onclick="BackToProducts()" id="btnBackToProducts">Back to Products</button>
+</div>
+
+<div style="display: flex;">
+    <div id="product-list">
+        {{#each prodss}}
+        <div class="divCardItem" data-id="{{product._id}}">
+            <div class="CardItem">
+                <div class="Header">
+                    {{#if product.thumbnails.length}}
+                    {{#each product.thumbnails}}
+                    <img src="{{urlmain}}" alt="{{title}}" class="ImgPic" />
+                    {{/each}}
+                    {{else}}
+                    <img src="https://media.istockphoto.com/id/1216251206/vector/no-image-available-icon.jpg?s=612x612&w=0&k=20&c=6C0wzKp_NZgexxoECc8HD4jRpXATfcu__peSYecAwt0="
+                        alt="Sin Imagen" class="ImgPic" />
+                    {{/if}}
+                    <div class="ItemData">
+                        <p>{{product.category}}</p>
+                        <h3 style="font-size: 1.5rem;">{{product.title}} - {{product.code}}</h3>
+                        <p>{{product.description}}</p>
+                        <p class="ItemDataPrice">Price: $ {{product.price}}</p>
+                        <p class="ItemDataQty">Quantity: {{quantity}}</p>
+                    </div>
+                </div>
+                <div class="ItemCardFooter">
+                    <button onclick="ViewProduct('{{product._id}}')" id="btnViewProduct">View Product</button>
+                    <button onclick="DeleteProduct('{{product._id}}', '{{../cartId}}')" id="btnDelete">Delete
+                        Product from Cart</button>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+        <p class="ItemDataSubtotal">Subtotal: $ {{subtotal}}</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script defer src="../js/cart.js"></script>

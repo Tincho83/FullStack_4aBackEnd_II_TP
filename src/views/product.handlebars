@@ -1,0 +1,39 @@
+<h1>{{titulo}}</h1>
+<div class="ItemCardFooter">
+    <button onclick="BackToProducts()" id="btnBackToProducts">Back to Products</button>
+    <button onclick="ViewCart()" id="btnViewCart">View Cart</button>
+</div>
+
+
+<div class="product-container">
+    <div class="product-details" data-id="{{product._id}}">
+        <div class="CardItem">
+            <div class="product-images">
+                {{#if product.thumbnails.length}}
+                {{#each product.thumbnails}}
+                <img src="{{this.urlmain}}" alt="{{title}}" class="ImgPic" />
+                {{/each}}
+                {{else}}
+                <img src="https://media.istockphoto.com/id/1216251206/vector/no-image-available-icon.jpg?s=612x612&w=0&k=20&c=6C0wzKp_NZgexxoECc8HD4jRpXATfcu__peSYecAwt0="
+                    alt="Sin Imagen" class="ImgPic" />
+                {{/if}}
+            </div>
+            <div class="product-info">
+                <h3 style="font-size: 1.5rem;">{{product.title}}</h3>
+                <p><strong>Categoría:</strong> {{product.category}}</p>
+                <p><strong>Código:</strong> {{product.code}}</p>
+                <p><strong>Descripción:</strong> {{product.description}}</p>
+                <p><strong>Precio:</strong> ${{product.price}}</p>
+                <p><strong>Disponibilidad:</strong> {{#if product.status}}Disponible{{else}}No Disponible{{/if}}</p>
+            </div>
+            <div class="ItemCardFooter">
+                <button onclick="AddProducttoCart('{{product._id}}')" id="btnAddProdToCart">Add Product to Cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script defer src="../js/product.js"></script>

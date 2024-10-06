@@ -1,0 +1,103 @@
+<p id="DateLastAccess"></p>
+<h1>{{titulo}}</h1>
+<div class="ItemCardFooter">
+    <button onclick="ViewCart()" id="btnViewCart">View Cart</button>
+</div>
+
+<div style="display: flex;">
+    <div id="product-list">
+
+        {{#each products}}
+        <div class="divCardItem" data-id="{{_id}}">
+            <div class="CardItem">
+                <div class="diviCartItem">
+                    {{#if status}}
+                    <p>Disponible: Si</p>
+                    {{else}}
+                    <p>Disponible: No</p>
+                    {{/if }}
+                </div>
+                <div class="Header">
+                    {{#if thumbnails.length}}
+                    {{#each thumbnails}}
+                    <img src="{{urlmain}}" alt="{{title}}" class="ImgPic" />
+                    {{/each}}
+                    {{else}}
+                    <img src="https://media.istockphoto.com/id/1216251206/vector/no-image-available-icon.jpg?s=612x612&w=0&k=20&c=6C0wzKp_NZgexxoECc8HD4jRpXATfcu__peSYecAwt0="
+                        alt="Sin Imagen" style="border-radius: 12px;" class="ImgPic" />
+                    {{/if}}
+                    <div class="ItemData">
+                        <p>{{category}}</p>
+                        <h3 style="font-size: 1.5rem;">{{title}} - {{code}}</h3>
+                        {{#if detalle}}
+                        <p>{{description}}</p>
+                        {{else}}
+                        {{/if}}
+                        <p class="ItemDataPrice">Price: $ {{price}}</p>
+                    </div>
+                </div>
+                <div class="ItemCardFooter">
+                    <button onclick="ViewProduct('{{_id}}')" id="btnViewProduct">View Product</button>
+                    <button onclick="AddProducttoCart('{{_id}}')" id="btnAddProdToCart">Add Product to Cart</button>
+                    <button onclick="DeleteProduct('{{_id}}')" id="btnDelete">Delete Product</button>
+                    <button
+                        onclick="ModifyProduct('{{_id}}', '{{title}}', '{{description}}', '{{code}}', {{price}}, {{stock}}, '{{category}}')"
+                        id="btnModify">Modify Product</button>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+
+    <hr>
+
+    <div class="divFormProd">
+        <form action="/api/products" method="post" id="add-product-form">
+            <input type="hidden" id="productId" name="productId" />
+            <label>Title</label>
+            <input type="text" name="title" id="title" placeholder="Title" required>
+            <br>
+            <label>Description</label>
+            <input type="text" name="description" id="description" placeholder="Description" required>
+            <br>
+            <label>Code</label>
+            <input type="text" name="code" id="code" placeholder="Product Code" required>
+            <br>
+            <label>Price</label>
+            <input type="number" name="price" id="price" placeholder="Price" required>
+            <br>
+            <label>Stock</label>
+            <input type="number" name="stock" id="stock" placeholder="Stock Quantity" required>
+            <br>
+            <label>Category</label>
+            <input type="text" name="category" id="category" placeholder="Category Name" required>
+            <br>
+            <input type="submit" id="btnSubmit" value="Add Product">
+        </form>
+    </div>
+</div>
+<div class="paginate" id="paginate">
+    {{#if dataObject.hasPrevPage}}
+    <a href="http://localhost:8080{{dataObject.prevLink}}" class="pagPrev">{{dataObject.prevPage}}</a>
+    {{else}}
+    {{/if}}
+
+    <p class="pagCurrent">{{dataObject.page}}</p>
+
+    {{#if dataObject.hasNextPage}}
+    <a href="http://localhost:8080{{dataObject.nextLink}}" class="pagNext">{{dataObject.nextPage}}</a>
+    {{else}}
+    {{/if}}
+
+    {{#if dataObject.hasLastPage}}
+    <a href="http://localhost:8080{{dataObject.lastLink}}" class="pagLast">{{dataObject.totalPages}}</a>
+    {{else}}
+    {{/if}}
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script defer src="js/realtimeproducts.js"></script>
