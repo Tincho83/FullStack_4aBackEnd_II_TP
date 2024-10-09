@@ -27,28 +27,47 @@
         </li> -->
 
         <li class="cabecera_divEnlacesHorizontales_ul_li">
-            <a href="/realtimeproducts" class="cabecera_Enlaces_img_a" target="_self">
+            <a href="/realtimeproducts?web=1" class="cabecera_Enlaces_img_a" target="_self">
                 <p class="cabecera_Enlaces_img_p">[realtimeproducts]</p>
             </a>
         </li>
 
+        {{#if isLogin}}
         <li class="cabecera_divEnlacesHorizontales_ul_li">
-            <a href="/signup.html" class="cabecera_Enlaces_img_a" target="_self">
-                <p class="cabecera_Enlaces_img_p">[Sign Up / Log In]</p>
+            <a href="/profile?web=1" class="cabecera_Enlaces_img_a" target="_self">
+                <p class="cabecera_Enlaces_img_p">[Your Profile]</p>
             </a>
         </li>
 
         <li class="cabecera_divEnlacesHorizontales_ul_li">
-            <a href="/login.html" class="cabecera_Enlaces_img_a" target="_self">
-                <p class="cabecera_Enlaces_img_p">[Sign In]</p>
-            </a>
-        </li>
-
-        <li class="cabecera_divEnlacesHorizontales_ul_li">
-            <a href="/login.html" class="cabecera_Enlaces_img_a" target="_self">
+            <a href="/api/sessions/logout?web=1" class="cabecera_Enlaces_img_a" target="_self">
                 <p class="cabecera_Enlaces_img_p">[Log Out]</p>
             </a>
         </li>
+        {{else}}
+        <li class="cabecera_divEnlacesHorizontales_ul_li">
+            <a href="/signup" class="cabecera_Enlaces_img_a" target="_self">
+                <p class="cabecera_Enlaces_img_p">[Sign Up / Register]</p>
+            </a>
+        </li>
+
+        <li class="cabecera_divEnlacesHorizontales_ul_li">
+            <a href="/login" class="cabecera_Enlaces_img_a" target="_self">
+                <p class="cabecera_Enlaces_img_p">[Sign In / Log In]</p>
+            </a>
+        </li>
+
+        <li class="cabecera_divEnlacesHorizontales_ul_li">
+            <a href="/login" class="cabecera_Enlaces_img_a" target="_self">
+                <p class="cabecera_Enlaces_img_p">[Log In GitHub]</p>
+            </a>
+        </li>
+        {{/if}}
+
+
+
+
+
 
     </ul>
 </div>

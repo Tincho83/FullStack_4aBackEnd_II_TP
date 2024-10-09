@@ -1,18 +1,106 @@
 const { Router } = require("express");
 const { isValidObjectId } = require("mongoose");
+const sessions = require("express-session");
+
 const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB.js");
 const ProductsManager = require("../dao/filesystem/ProductsManager.js");
 const CartsManager = require("../dao/filesystem/CartsManager.js");
 const CartsManagerMongoDB = require("../dao/db/CartsManagerMongoDB.js");
+const authMiddleware = require("../middlewares/authMiddleware.js");
 
 const router = Router();
 
+let changename = undefined;
+
 //1. EndPoint para vista Home
 router.get("/", (req, res) => {
-    let titulo = "Bienvenido al Portal de Acceso a Productos";
+
+    let titulo = "Te damos la bienvenida al Portal de Acceso a Productos.";
+    const name = req.query.name;
+    console.log(`0:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+
+    // Verificar si el nombre ha cambiado o si ha sido removido el parámetro
+    if (req.session.previousName && req.session.previousName !== name) {
+        // Si el nombre cambió o se removió, reseteamos el contador y usuario
+        req.session.contador = 0;
+        req.session.user = null;
+        console.log(`1:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    }
+
+    // Si el parámetro "name" está presente y es diferente al nombre anterior o no existe en la sesión
+    if (name && (!req.session.user || req.session.user !== name)) {
+        req.session.user = name;
+        req.session.contador = 1; // Reiniciar contador al cambiar o agregar nombre
+        console.log(`2:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    } else if (!name && req.session.contador === 0) {
+        // Si no hay un nombre y no hay contador, inicializarlo
+        req.session.contador = 1;
+        console.log(`3:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    } else if (req.session.contador) {
+        req.session.contador++; // Incrementar el contador si ya existe
+        console.log(`4:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    } else {
+        req.session.contador = 1;
+        console.log(`5:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    }
+
+    // Construcción del título basado en si hay un usuario o no
+    if (!req.session.user) {
+        titulo += ` Has visitado la página ${req.session.contador} veces sin haberte registrado. Te invitamos a Registrarte o Iniciar Sesión`;
+        console.log(`6:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    } else {
+        titulo += ` ${req.session.user}, has visitado la página ${req.session.contador} veces.`;
+        console.log(`7:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    }
+
+    // Guardar el valor actual de name en la sesión para futuras comparaciones
+    req.session.previousName = name;
+    console.log(`8:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+
+    let sesion = JSON.stringify(req.session);
+
+    console.log(`9:  session: ${sesion}`);
+
+    // Renderizar la respuesta
     res.setHeader('Content-type', 'text/html');
-    res.status(200).render("home", { titulo });
+    res.status(200).render("home", { titulo, isLogin: req.session.user });
+
 });
+
+router.get("/signup", (req, res) => {
+    let titulo = "Registracion.";
+
+    res.setHeader('Content-type', 'text/html');
+    res.status(200).render("signup", { titulo, isLogin: req.session.user });
+});
+
+router.get("/login", (req, res) => {
+    let titulo = "Inicio de Sesion.";
+
+    res.setHeader('Content-type', 'text/html');
+    res.status(200).render("login", { titulo, isLogin: req.session.user });
+});
+
+router.get("/profile", authMiddleware, (req, res) => {
+    let titulo = `Bienvenido \r\n\r\n Perfil`;
+
+    let usuario = req.session.user;
+    console.log(usuario);
+
+    if (req.session.contador) {
+        req.session.contador++;
+        titulo += ` Visita ${req.session.contador}`
+    } else {
+        req.session.contador = 1;
+        titulo += ` Visita ${req.session.contador}`
+    }
+
+    res.setHeader('Content-type', 'text/html');
+    res.status(200).render("profile", { titulo, usuario, isLogin: req.session.user });
+});
+
+
+
 
 //2. EndPoint para vista de producto en /products
 router.get('/products/:pid', async (req, res) => {
@@ -242,12 +330,13 @@ router.get('/products', async (req, res) => {
     res.status(200).render("index", {
         titulo,
         products: prodss.docs,
-        dataObject
+        dataObject,
+        isLogin: req.session.user
     });
 })
 
 //5. EndPoint para vista de productos en tiempo real usando socket.io
-router.get('/realtimeproducts', async (req, res) => {
+router.get('/realtimeproducts', authMiddleware, async (req, res) => {
 
     let titulo = "Listado de Productos en tiempo Real";
     let prodss;
@@ -393,8 +482,10 @@ router.get('/realtimeproducts', async (req, res) => {
     res.status(200).render("realTimeProducts", {
         titulo,
         products: prodss.docs,
-        dataObject
+        dataObject,
+        isLogin: req.session.user
     });
 });
+
 
 module.exports = { router };

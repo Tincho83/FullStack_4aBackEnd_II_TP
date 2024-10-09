@@ -1,0 +1,41 @@
+<div class="login-container">
+    <div class="avatar">
+        <img src="img/avatar.png" alt="Avatar">
+    </div>
+    <form class="login-form" id="loginForm">
+        <div class="input-group">
+            <label for="firstname"></label>
+            <input type="text" id="firstname" name="firstname" placeholder="First Name" required>
+        </div>
+        <div class="input-group">
+            <label for="lastname"></label>
+            <input type="text" id="lastname" name="lastname" placeholder="Last Name" required>
+        </div>
+        <div class="input-group">
+            <label for="email"></label>
+            <input type="text" id="email" name="email" placeholder="e-Mail" required>
+        </div>
+        <div class="input-group">
+            <label for="age"></label>
+            <input type="text" id="age" name="age" placeholder="age" required>
+        </div>
+        <!--
+        <div class="input-group">
+            <label for="role"></label>
+            <input type="text" id="role" name="role" placeholder="Role" required>
+        </div>
+        -->
+        <div class="input-group">
+            <label for="password"></label>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+        </div>
+        <button type="submit" id="login-btn" class="login-btn" value="SignUp User">Create User</button>
+        <div class="remember-me">
+            <a href="/login" class="forgot-password">Back to Sign In</a>
+        </div>
+        <button id="getcookie-btn" class="getcookie-btn" value="Get Cookie">Get Cookie</button>
+        <button id="delcookie-btn" class="delcookie-btn" value="Del Cookie">Del Cookie</button>
+
+    </form>
+</div>
+<script defer src="js/signup.js"></script>

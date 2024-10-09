@@ -10,7 +10,9 @@ const config = {
     MONGO_COLLMSGSNAME: "messages",
     MONGO_COLLUSERSNAME: "users",
     CookieParser_SECRET: "Tincho03$",
-    ExpressSessions_SECRET: "Tincho03$"
+    ExpressSessions_SECRET: "Tincho07$",
+    PATH_LOGFILE: "./src/log.txt",
+    PATH_STOSESS: "./src/sessions"
 }
 
 module.exports = { config };

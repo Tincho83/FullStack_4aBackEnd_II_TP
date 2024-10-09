@@ -3,15 +3,18 @@ const { isValidObjectId } = require("mongoose");
 const ProductsManager = require("../dao/filesystem/ProductsManager.js");
 const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB");
 const { ProductsModel } = require("../dao/models/ProductsModel.js");
+const authMiddleware = require("../middlewares/authMiddleware.js");
 
 const router = Router();
 
 //ProductsManager.path = "./src/data/productos.json";
 
 //EndPopints para el manejo de products
-
+console.log("Products Router");
 // 1.Obtener todos los productos
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
+
+    console.log("/Products");
 
     let prodss;
     let dataObject = {};
@@ -110,7 +113,7 @@ router.get('/', async (req, res) => {
         } else {
             nextLink = null;
         }
-        
+
         pageLink = `${baseUrl}${filters}`;
         lastLink = `/products?page=${prodss.totalPages}&limit=${limit}${filters}`;
 
@@ -184,9 +187,9 @@ router.get('/:id', async (req, res) => {
 
 // 3.Agregar producto
 router.post('/', async (req, res) => {
-    
+
     let { title, description, code, price, stock, category } = req.body;
-    
+
     if (!title || !description || !code || !price || !stock || !category) {
         res.setHeader('Content-type', 'application/json');
         return res.status(400).json({ status: "error", error: "Incomplete values." })
@@ -199,9 +202,9 @@ router.post('/', async (req, res) => {
             res.setHeader('Content-type', 'application/json');
             return res.status(400).json({ error: `Producto ${code} existente en DB.` })
         }
-        
+
         let prodNew = await ProductsManagerMongoDB.addProductDBMongo({ title, description, code, price, stock, category })
-        
+
         req.socket.emit("nuevoProducto", prodNew);
         console.log("Evento *nuevoProducto* emitido");
 
@@ -220,17 +223,17 @@ router.post('/', async (req, res) => {
 
 //4.Actualizar producto
 router.put('/:id', async (req, res) => {
-    
+
     let { id } = req.params;
     if (!isValidObjectId(id)) {
         res.setHeader('Content-type', 'application/json');
         return res.status(400).json({ error: `id: ${id} no valido,` })
     }
-    
+
     let prodToModify = req.body;
-    
+
     let existingProduct = await ProductsModel.findOne({ _id: id });
-    
+
     if (existingProduct && existingProduct.id !== id) {
         console.log(existingProduct);
         res.setHeader('Content-type', 'application/json');
@@ -247,7 +250,7 @@ router.put('/:id', async (req, res) => {
             return res.status(400).json({ error: `El código ${prodToModify.code} ya está en uso por otro producto.` });
         }
     }
-    
+
     try {
         let prodModified = await ProductsManagerMongoDB.updateProductDBMongo(id, prodToModify)
         if (!prodModified) {

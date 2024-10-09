@@ -6,50 +6,53 @@ const { engine } = require("express-handlebars");
 const { Server } = require("socket.io");
 const cookieParser = require("cookie-parser");
 const sessions = require("express-session");
+const FileStore = require("session-file-store");
+const MongoStore = require("connect-mongo");
 
 const { router: productsRouter } = require("../src/routes/products.router.js");
 const { router: cartsRouter } = require("../src/routes/carts.router.js");
 const { router: viewsRouter } = require("../src/routes/views.router.js");
 const { router: usersRouter } = require("../src/routes/users.router.js");
+const { router: sessionsRouter } = require("../src/routes/sessions.router.js");
+const { router: cookiesRouter } = require("../src/routes/cookies.router.js");
 
 const logMiddleware = require('./middlewares/logMiddleware.js');
 
 const { connDB } = require("./connDB.js");
 const { config } = require("./config/config.js");
 
+//const { UsersModel } = require("./dao/models/UsersModel.js");
+//const UsersManagerMongoDB = require("./dao/db/UsersManagerMongoDB.js");
+
 
 const PORT = config.PORT;
 let serverSocket;
 
+const fileStore = FileStore(sessions);
+
 const app = express();
-
-app.use(cookieParser(config.CookieParser_SECRET));
-console.log("Set Cookie");
-app.get("/setCookie", (req, res) => {
-    // Creación de la cookie
-    res.cookie("NombreCookie", "ValorCookie", { maxAge: 1000 * 600 }).send("Cookie establecida");
-});
-
-console.log("Get Cookie");
-app.get("/getCookie", (req, res) => {
-    // Acceso a la cookie
-    let cookie = req.cookies.NombreCookie;
-    res.send(`Cookie valor: ${cookie}`);
-});
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(sessions({ secret: config.ExpressSessions_SECRET,
-                   resave: true,
-                   // cookie: { secure: false }, // Cambiar a true si se usa https
-                   saveUninitialized: true, }));
 
+app.use(cookieParser(config.CookieParser_SECRET));
+
+app.use(logMiddleware);
 
 let ruta = join(__dirname, "public");
 app.use(express.static(ruta));
 
-app.use(logMiddleware);
+app.use(sessions({
+    secret: config.ExpressSessions_SECRET,
+    resave: true, // cookie: { secure: false }, // Cambiar a true si se usa https    
+    saveUninitialized: true,
+    //store: new fileStore({ path: config.PATH_STOSESS, ttl:830, retries: 0}) //Persistencia en FS
+    store: MongoStore.create({
+            mongoUrl: config.MONGO_URL,
+            dbName: config.MONGO_DBNAME,
+            ttl: 830,
+        })
+}));
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
@@ -66,10 +69,57 @@ app.use("/api/carts/", cartsRouter);
 
 app.use('/api/users', usersRouter);
 
+app.use('/api/cookies', cookiesRouter);
+
+app.use('/api/sessions', sessionsRouter);
+
 app.use("/", (req, res, next) => {
     req.socket = serverSocket;
     next();
 }, viewsRouter);
+
+/*
+first_name
+"Admin"
+
+last_name
+"Admin"
+
+email
+"admin@test.com"
+
+role
+"admin"
+
+password
+"admin123"
+
+app.get("/login", async (req, res) => {
+    let { email, password } = req.query;
+    res.setHeader('Set-Cookie', 'Titulo=Subtitulo;Path=/');
+
+    if (!email || !password) {
+        res.setHeader('Content-type', 'application/json');
+        return res.status(400).json({ status: "error", error: "Incomplete values." })
+    }
+    console.log(email);
+    console.log(password);
+
+    //http://localhost:8080/login?email=admin&password=admin123
+    let user = await UsersManagerMongoDB.getUserCredencialesDBMongo(email, password);
+
+    if (!user) {
+        res.setHeader('Content-type', 'application/json');
+        return res.status(401).json({ status: "error", error: "Credenciales Invalidas." })
+    }
+
+    console.log(user);
+
+    req.session.user = user;
+    res.setHeader('Content-type', 'application/json');
+    return res.status(200).json({ payload: `Login Ok de: ${user.email}` });
+})
+*/
 
 
 const serverHTTP = app.listen(PORT, () => console.log(`

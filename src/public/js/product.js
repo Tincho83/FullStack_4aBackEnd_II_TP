@@ -88,7 +88,9 @@ async function AddProducttoCart(productId) {
 
 // Funcion para volver a la pagina de productos
 function BackToProducts() {
+    console.log("/Products002");
     window.location.href = "/products";
+
 }
 
 // Funcion para validar MongoDB id, usando expresion regular
