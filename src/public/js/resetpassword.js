@@ -1,39 +1,32 @@
-const loginForm = document.getElementById('loginForm');
+const loginForm = document.getElementById('resetpassForm');
 
 const e_mail = document.getElementById('email');
-const passw = document.getElementById('password');
-const btnSubmit = document.getElementById('login-btn');
+const passw = document.getElementById('newpassword');
+const btnSubmit = document.getElementById('resetpass-btn');
 
-const params = new URLSearchParams(window.location.search);
-
-let mensaje = params.get("mensaje");
-if(mensaje){
-    alert(mensaje);
-}
-
-console.log("login.js");
+console.log("resetpassword.js");
 
 btnSubmit.addEventListener("click", async (event) => {
     event.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
 
-    console.log("submit clic");
+    console.log("resetpassword.js >>> submit clic");
 
     let email = e_mail.value;
     let password = passw.value;
 
-    console.log("email: ", email);
-    console.log("pass: ", password);
-
-    if ( !email || !password) {
+    if (!email || !password) {
         alert('Complete Datos');
         return;
     }
 
+    console.log("email:", email);
+    console.log("Password:", password);
+
     let body = { email, password }
 
-    console.log("fetch para /login");
-    let respuesta = await fetch("/api/sessions/login", {
-        method: "POST",
+    console.log("fetch para /resetpassword");
+    let respuesta = await fetch("/api/sessions/resetpassword", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
     })
@@ -44,9 +37,9 @@ btnSubmit.addEventListener("click", async (event) => {
     if (respuesta.status >= 400) {
         console.log(datos.error);
         alert(datos.error);
-    } else {
-        //window.location.href = `/profile`;
-        window.location.href = `/products`;
+    } else {               
+        console.log("Redirigir");
+        window.location.href = `/login?mensaje=Reset Correcto ${datos.result.email}`;
     }
 
 })

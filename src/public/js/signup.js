@@ -79,7 +79,7 @@ btnSubmit.addEventListener("click", async (event) => {
             .catch(error => console.error('Error:', error));
 
         console.log("Redirigir");
-        window.location.href = `/login?mensaje=Registo Correcto ${datos.result.email}`;
+        window.location.href = `/login?mensaje=Registo Correcto ${datos.newuser.email}`; //marca
     }
 
 })

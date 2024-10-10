@@ -10,7 +10,7 @@ const router = Router();
 //ProductsManager.path = "./src/data/productos.json";
 
 //EndPopints para el manejo de products
-console.log("Products Router");
+
 // 1.Obtener todos los productos
 router.get('/', authMiddleware, async (req, res) => {
 

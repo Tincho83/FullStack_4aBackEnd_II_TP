@@ -1,5 +1,10 @@
-
-<h2>Perfil: {{usuario.first_name}}</h2>
+<br>
+<h2>Perfil: {{usuario.first_name}} {{usuario.last_name}} </h2>
 <h2>Edad: {{usuario.age}} años</h2>
-<hr>
 <p>Email: {{usuario.email}}</p>
+<p>Rol: {{usuario.role}}</p>
+<hr>
+<br>
+<a href="/api/sessions/logout?web=1" class="cabecera_Enlaces_img_a" target="_self">
+    <p class="cabecera_Enlaces_img_p">[Log Out]</p>
+</a>

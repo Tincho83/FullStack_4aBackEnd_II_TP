@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const sessions = require("express-session");
 const FileStore = require("session-file-store");
 const MongoStore = require("connect-mongo");
+const passport = require("passport");
 
 const { router: productsRouter } = require("../src/routes/products.router.js");
 const { router: cartsRouter } = require("../src/routes/carts.router.js");
@@ -20,6 +21,7 @@ const logMiddleware = require('./middlewares/logMiddleware.js');
 
 const { connDB } = require("./connDB.js");
 const { config } = require("./config/config.js");
+const { initPassport } = require("./config/passport.config.js");
 
 //const { UsersModel } = require("./dao/models/UsersModel.js");
 //const UsersManagerMongoDB = require("./dao/db/UsersManagerMongoDB.js");
@@ -53,6 +55,10 @@ app.use(sessions({
             ttl: 830,
         })
 }));
+initPassport();
+app.use(passport.initialize());
+app.use(passport.session()); //SOlo si uso sessions
+
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');

@@ -19,6 +19,11 @@ router.get("/", (req, res) => {
     const name = req.query.name;
     console.log(`0:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
 
+    if (!req.session.user) {
+        console.log(`Redireccionando a /Login`);
+        return res.redirect("/login");
+    }
+
     // Verificar si el nombre ha cambiado o si ha sido removido el parámetro
     if (req.session.previousName && req.session.previousName !== name) {
         // Si el nombre cambió o se removió, reseteamos el contador y usuario
@@ -65,10 +70,13 @@ router.get("/", (req, res) => {
     res.setHeader('Content-type', 'text/html');
     res.status(200).render("home", { titulo, isLogin: req.session.user });
 
+
 });
 
 router.get("/signup", (req, res) => {
     let titulo = "Registracion.";
+
+    console.log("views.router /signup");
 
     res.setHeader('Content-type', 'text/html');
     res.status(200).render("signup", { titulo, isLogin: req.session.user });
@@ -76,6 +84,8 @@ router.get("/signup", (req, res) => {
 
 router.get("/login", (req, res) => {
     let titulo = "Inicio de Sesion.";
+
+    console.log("views.router /login");
 
     res.setHeader('Content-type', 'text/html');
     res.status(200).render("login", { titulo, isLogin: req.session.user });
@@ -97,6 +107,13 @@ router.get("/profile", authMiddleware, (req, res) => {
 
     res.setHeader('Content-type', 'text/html');
     res.status(200).render("profile", { titulo, usuario, isLogin: req.session.user });
+});
+
+router.get("/resetpassword", (req, res) => {
+    let titulo = `Bienvenido`;
+   
+    res.setHeader('Content-type', 'text/html');
+    res.status(200).render("resetpassword", { titulo });
 });
 
 
@@ -184,12 +201,16 @@ router.get('/carts/:cid', async (req, res) => {
 })
 
 //4. EndPoint para vista productos
-router.get('/products', async (req, res) => {
+router.get('/products', authMiddleware, async (req, res) => {
 
-    let titulo = "Listado de Productos";
     let prodss;
     let dataObject = {};
     let cSort = {};
+
+    let usersession = req.session.user;
+
+    let titulo = `Bienvenido ${req.session.user.role} ${req.session.user.first_name} ${req.session.user.last_name} (${req.session.user.email}). Listado de Productos`;
+    console.log(titulo);
 
     let { page, limit, sort, query, type } = req.query;
 
@@ -338,10 +359,13 @@ router.get('/products', async (req, res) => {
 //5. EndPoint para vista de productos en tiempo real usando socket.io
 router.get('/realtimeproducts', authMiddleware, async (req, res) => {
 
-    let titulo = "Listado de Productos en tiempo Real";
     let prodss;
     let dataObject = {};
     let cSort = {};
+
+    let usersession = req.session.user;
+
+    let titulo = `Bienvenido ${req.session.user.role} ${req.session.user.first_name} ${req.session.user.last_name} (${req.session.user.email}). Listado de Productos en tiempo Real`;
 
     let { page, limit, sort, query, type } = req.query;
 

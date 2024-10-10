@@ -1,12 +1,12 @@
 ![image](/src/public/img/demo.PNG)
-# BackEnd I - Entrega TP3 (Conclusivo)
+# BackEnd II - Entrega TP 
 ## _Servidor con endpoints y servicios para gestionar los productos y carritos de compra de un e-commerce integrando vistas Handlebars, websocket y BD._  
   
 ### Vista previa / Preview
 ![image](/src/public/img/demo.gif)
 
 ### Depliegue / Deploy
-[BackEnd I Entrega TP3 (Conclusivo)](https://ecommbackend1b.netlify.app/) (No disponible por el momento.)
+[BackEnd II Entrega TP3 (Conclusivo)](https://ecommbackend1b.netlify.app/) (No disponible por el momento.)
 
 ### Descripcion / Description
 Aplicativo Backend para e-commerce realizado en javascript, express, Handlebars, websocket y BD para el curso de Backend I en CoderHouse.  

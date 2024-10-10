@@ -24,6 +24,10 @@ class UsersManagerMongoDB {
         return prodNew.toJSON();
     }
 
+    //*Actualizar User desde id con User con valores
+    static async updateUserDBMongo(id, User) {
+        return await UsersModel.findByIdAndUpdate(id, User, { new: true }).lean();
+    }
 
 
     //Obtener Users con paginacion
@@ -41,10 +45,7 @@ class UsersManagerMongoDB {
 
 
 
-    //Actualizar User desde id con User con valores
-    static async updateUserDBMongo(id, User) {
-        return await UsersModel.findByIdAndUpdate(id, User, { new: true }).lean();
-    }
+
 
     //Borrar User de la BBDD
     static async deleteUserDBMongo(id) {
