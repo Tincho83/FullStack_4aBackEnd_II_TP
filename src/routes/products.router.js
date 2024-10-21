@@ -14,8 +14,6 @@ const router = Router();
 // 1.Obtener todos los productos
 router.get('/', authMiddleware, async (req, res) => {
 
-    console.log("/Products");
-
     let prodss;
     let dataObject = {};
     let cSort = {};
@@ -28,7 +26,6 @@ router.get('/', authMiddleware, async (req, res) => {
             status: 'error',
             message: 'Tipo de búsqueda inválido.'
         };
-        //console.log(`${dataObject.status}: ${dataObject.message} `);
 
         // Retornar error 400 (Bad Request) indicando que el tipo no es valido
         res.setHeader('Content-type', 'application/json');

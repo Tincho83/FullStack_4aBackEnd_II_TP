@@ -9,6 +9,7 @@ const sessions = require("express-session");
 const FileStore = require("session-file-store");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
 const { router: productsRouter } = require("../src/routes/products.router.js");
 const { router: cartsRouter } = require("../src/routes/carts.router.js");
@@ -22,9 +23,7 @@ const logMiddleware = require('./middlewares/logMiddleware.js');
 const { connDB } = require("./connDB.js");
 const { config } = require("./config/config.js");
 const { initPassport } = require("./config/passport.config.js");
-
-//const { UsersModel } = require("./dao/models/UsersModel.js");
-//const UsersManagerMongoDB = require("./dao/db/UsersManagerMongoDB.js");
+const { passportCall } = require("./utils/utils.js");
 
 
 const PORT = config.PORT;
@@ -50,14 +49,15 @@ app.use(sessions({
     saveUninitialized: true,
     //store: new fileStore({ path: config.PATH_STOSESS, ttl:830, retries: 0}) //Persistencia en FS
     store: MongoStore.create({
-            mongoUrl: config.MONGO_URL,
-            dbName: config.MONGO_DBNAME,
-            ttl: 830,
-        })
+        mongoUrl: config.MONGO_URL,
+        dbName: config.MONGO_DBNAME,
+        ttl: 830,
+    })
 }));
+//Paso 2:
 initPassport();
 app.use(passport.initialize());
-app.use(passport.session()); //SOlo si uso sessions
+//app.use(passport.session()); //SOlo si uso sessions
 
 
 app.engine('handlebars', engine());
@@ -69,7 +69,7 @@ app.use("/api/products",
     (req, res, next) => {
         req.socket = serverSocket;
         next();
-    }, productsRouter);
+    }, passport.authenticate("current", { session: false }), productsRouter);  // para passportCall: passportCall("current"), productsRouter); 
 
 app.use("/api/carts/", cartsRouter);
 
@@ -83,50 +83,6 @@ app.use("/", (req, res, next) => {
     req.socket = serverSocket;
     next();
 }, viewsRouter);
-
-/*
-first_name
-"Admin"
-
-last_name
-"Admin"
-
-email
-"admin@test.com"
-
-role
-"admin"
-
-password
-"admin123"
-
-app.get("/login", async (req, res) => {
-    let { email, password } = req.query;
-    res.setHeader('Set-Cookie', 'Titulo=Subtitulo;Path=/');
-
-    if (!email || !password) {
-        res.setHeader('Content-type', 'application/json');
-        return res.status(400).json({ status: "error", error: "Incomplete values." })
-    }
-    console.log(email);
-    console.log(password);
-
-    //http://localhost:8080/login?email=admin&password=admin123
-    let user = await UsersManagerMongoDB.getUserCredencialesDBMongo(email, password);
-
-    if (!user) {
-        res.setHeader('Content-type', 'application/json');
-        return res.status(401).json({ status: "error", error: "Credenciales Invalidas." })
-    }
-
-    console.log(user);
-
-    req.session.user = user;
-    res.setHeader('Content-type', 'application/json');
-    return res.status(200).json({ payload: `Login Ok de: ${user.email}` });
-})
-*/
-
 
 const serverHTTP = app.listen(PORT, () => console.log(`
 

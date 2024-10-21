@@ -13,13 +13,17 @@ const usersSchema = new mongoose.Schema(
         age: { type: Number, required: true },
         role: { type: String, required: true, default: 'user' },
         password: { type: String },
-        //cart: { Id: { type: mongoose.Schema.Types.ObjectId, ref: "carts" } },
+        cart: { Id: { type: mongoose.Schema.Types.ObjectId, ref: "carts" } },
     },
     {
         timestamps: true,
-        strict: false,
+        //strict: false, //sacar para usuarios
     }
 )
+
+usersSchema.pre("findOne", function () {
+    this.populate("cart.Id").lean();
+});
 
 const UsersModel = mongoose.model(
     usersColl,

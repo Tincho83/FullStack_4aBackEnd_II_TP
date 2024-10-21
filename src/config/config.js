@@ -11,8 +11,13 @@ const config = {
     MONGO_COLLUSERSNAME: "users",
     CookieParser_SECRET: "Tincho03$",
     ExpressSessions_SECRET: "Tincho07$",
+    JWT_SECRET: "Tincho11$",
     PATH_LOGFILE: "./src/log.txt",
-    PATH_STOSESS: "./src/sessions"
+    PATH_STOSESS: "./src/sessions",
+    GITHUB_APPID: "1021894",
+    GITHUB_CLIENTID: "Iv23lio4Na64NA4Q6u86",
+    GITHUB_CLIENTSECRET: "f7a7e78ba138695c859771052a19c3d1baf01a2f",
+    GITHUB_CALLBACKURL: "http://localhost:8080/api/sessions/callbackGithub"   
 }
 
 module.exports = { config };

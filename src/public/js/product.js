@@ -1,3 +1,6 @@
+
+
+
 // Funcion para agregar producto al carrito
 async function AddProducttoCart(productId) {
 
@@ -55,11 +58,11 @@ async function AddProducttoCart(productId) {
     //console.log(`Carrito ID: ${cartId}, Producto ID: ${productId}`);
 
     try {
-        const response = await fetch(`/api/carts/${cartId}/product/${productId}`, {            
+        const response = await fetch(`/api/carts/${cartId}/product/${productId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            },            
+            },
         });
 
         if (response.ok) {
@@ -88,7 +91,6 @@ async function AddProducttoCart(productId) {
 
 // Funcion para volver a la pagina de productos
 function BackToProducts() {
-    console.log("/Products002");
     window.location.href = "/products";
 
 }

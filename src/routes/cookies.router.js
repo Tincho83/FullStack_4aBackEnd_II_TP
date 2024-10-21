@@ -12,8 +12,8 @@ router.get('/getcookie', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         return res.status(401).json({ error: `No hay cookies.` });
     } else {
-        console.log("Cookies: ", req.cookies);
-        console.log("Cookies Firmadas: ", req.signedCookies);
+        //console.log("Cookies: ", req.cookies);
+        //console.log("Cookies Firmadas: ", req.signedCookies);
 
         // Acceso a la cookie
         let cookies = req.cookies;
@@ -35,26 +35,15 @@ router.get('/getcookie', (req, res) => {
 router.post('/setcookie', (req, res) => {
 
     const { user } = req.body;
-    console.log("body: ", req.body);
-    console.log("mail: ", user);
-
-    //console.log("Cookies: ", req.cookies);
-    //console.log("Cookies Firmadas: ", req.signedCookies);
 
     let iComCookie = {
         "user": user
     };
 
-
-    console.log("icom: ", iComCookie);
-
-    //res.cookie("SignUp", cookieFirm, { maxAge: 1000 * 60 * 7, signed: true });
-
-    // Creación de la cookie... mas adelante httponly: true... expires: new Date(2024,8,30)
-    res.cookie("iCommerce", iComCookie, { maxAge: 1000 * 60 * 14, signed: true });
+    res.cookie("SignUpUser", iComCookie, { maxAge: 1000 * 60 * 1, signed: true, httpOnly: true });
 
     res.setHeader('Content-type', 'application/json');
-    return res.status(200).json({ payload: "Cookie/s Generada/s" });
+    return res.status(200).json({ payload: "Cookie Generada" });
 
 });
 

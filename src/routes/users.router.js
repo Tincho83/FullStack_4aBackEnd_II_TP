@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
             error: `Error inesperado en el servidor, vuelva a intentar mas tarde o contacte con el administrador.`,
             detalle: `${error.message}`
         });
+        //processesErrors(res, error);
         //res.status(500).send({ status: 'error', message: error.message });
     }
 });

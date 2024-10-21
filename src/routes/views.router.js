@@ -1,12 +1,16 @@
 const { Router } = require("express");
 const { isValidObjectId } = require("mongoose");
 const sessions = require("express-session");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
 const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB.js");
 const ProductsManager = require("../dao/filesystem/ProductsManager.js");
 const CartsManager = require("../dao/filesystem/CartsManager.js");
 const CartsManagerMongoDB = require("../dao/db/CartsManagerMongoDB.js");
+
 const authMiddleware = require("../middlewares/authMiddleware.js");
+const { config } = require("../config/config");
 
 const router = Router();
 
@@ -15,103 +19,125 @@ let changename = undefined;
 //1. EndPoint para vista Home
 router.get("/", (req, res) => {
 
-    let titulo = "Te damos la bienvenida al Portal de Acceso a Productos.";
-    const name = req.query.name;
-    console.log(`0:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
-
-    if (!req.session.user) {
-        console.log(`Redireccionando a /Login`);
+    // Verificar si existe la cookie con el token JWT
+    if (!req.cookies.currentUser) {
         return res.redirect("/login");
     }
 
-    // Verificar si el nombre ha cambiado o si ha sido removido el parámetro
-    if (req.session.previousName && req.session.previousName !== name) {
-        // Si el nombre cambió o se removió, reseteamos el contador y usuario
-        req.session.contador = 0;
-        req.session.user = null;
-        console.log(`1:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    try {
+        let usuario = jwt.verify(req.cookies.currentUser, config.JWT_SECRET);
+        req.user = usuario;
+    } catch (error) {
+        if (error.name === "TokenExpiredError") {
+
+            res.clearCookie('currentUser');
+            return res.status(401).json({ error: "Token expirado. Por favor, actualize la pagina e inicie sesión de nuevo." });
+        } else {
+            console.log("Error al verificar el token: ", error.message);
+            return res.status(401).json({ error: "Token inválido. Acceso no autorizado." });
+        }
     }
 
-    // Si el parámetro "name" está presente y es diferente al nombre anterior o no existe en la sesión
-    if (name && (!req.session.user || req.session.user !== name)) {
-        req.session.user = name;
-        req.session.contador = 1; // Reiniciar contador al cambiar o agregar nombre
-        console.log(`2:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
-    } else if (!name && req.session.contador === 0) {
-        // Si no hay un nombre y no hay contador, inicializarlo
-        req.session.contador = 1;
-        console.log(`3:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
-    } else if (req.session.contador) {
-        req.session.contador++; // Incrementar el contador si ya existe
-        console.log(`4:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
-    } else {
-        req.session.contador = 1;
-        console.log(`5:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    let token = req.cookies.currentUser;
+
+    let usuario = jwt.verify(token, config.JWT_SECRET);
+    req.user = usuario;
+
+    let contador = usuario.contador ? usuario.contador + 1 : 1;
+
+    // Actualizar el token JWT con el contador actualizado
+    let nuevoToken = jwt.sign({ ...usuario, contador: contador }, config.JWT_SECRET, {});
+
+    // Guardar el nuevo token en la cookie
+    res.cookie("currentUser", nuevoToken, { httpOnly: true });
+
+
+
+    let titulo = "Te damos la bienvenida al Portal de Acceso a Productos.";
+
+    if (!req.user) {
+        return res.redirect("/login");
     }
 
     // Construcción del título basado en si hay un usuario o no
-    if (!req.session.user) {
-        titulo += ` Has visitado la página ${req.session.contador} veces sin haberte registrado. Te invitamos a Registrarte o Iniciar Sesión`;
-        console.log(`6:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+    if (!req.user) {
+        titulo += ` Has visitado la página ${req.contador} veces sin haberte registrado. Te invitamos a Registrarte o Iniciar Sesión`;        
     } else {
-        titulo += ` ${req.session.user}, has visitado la página ${req.session.contador} veces.`;
-        console.log(`7:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
+        titulo += ` ${req.user.first_name} ${req.user.last_name}, has visitado la página ${contador} veces.`;        
     }
 
-    // Guardar el valor actual de name en la sesión para futuras comparaciones
-    req.session.previousName = name;
-    console.log(`8:  params: ${req.query.name}, name: ${name}, session: ${req.session.user}, contador: ${req.session.contador}, previousname: ${req.session.previousName}`);
-
-    let sesion = JSON.stringify(req.session);
-
-    console.log(`9:  session: ${sesion}`);
+    let sesion = JSON.stringify(req.session);    
 
     // Renderizar la respuesta
     res.setHeader('Content-type', 'text/html');
-    res.status(200).render("home", { titulo, isLogin: req.session.user });
-
-
+    res.status(200).render("home", { titulo, isLogin: req.user });
 });
 
 router.get("/signup", (req, res) => {
     let titulo = "Registracion.";
 
-    console.log("views.router /signup");
+    // Verificar si existe la cookie con el token JWT
+    if (req.cookies.currentUser) {
+        return res.redirect("/profile");
+    }
 
     res.setHeader('Content-type', 'text/html');
-    res.status(200).render("signup", { titulo, isLogin: req.session.user });
+    res.status(200).render("signup", { titulo, isLogin: req.user });
 });
 
 router.get("/login", (req, res) => {
     let titulo = "Inicio de Sesion.";
 
-    console.log("views.router /login");
-
-    res.setHeader('Content-type', 'text/html');
-    res.status(200).render("login", { titulo, isLogin: req.session.user });
-});
-
-router.get("/profile", authMiddleware, (req, res) => {
-    let titulo = `Bienvenido \r\n\r\n Perfil`;
-
-    let usuario = req.session.user;
-    console.log(usuario);
-
-    if (req.session.contador) {
-        req.session.contador++;
-        titulo += ` Visita ${req.session.contador}`
-    } else {
-        req.session.contador = 1;
-        titulo += ` Visita ${req.session.contador}`
+    if (req.cookies.currentUser) {
+        return res.redirect("/profile");
     }
 
     res.setHeader('Content-type', 'text/html');
-    res.status(200).render("profile", { titulo, usuario, isLogin: req.session.user });
+    res.status(200).render("login", { titulo, isLogin: req.user });
+});
+
+router.get("/profile", passport.authenticate("current", { session: false }), (req, res) => {
+
+    // Verificar si existe la cookie con el token JWT
+    if (!req.cookies.currentUser) {
+        return res.redirect("/login");
+    }
+
+    try {
+        let usuario = jwt.verify(req.cookies.currentUser, config.JWT_SECRET);
+        req.user = usuario;
+    } catch (error) {
+        if (error.name === "TokenExpiredError") {
+
+            res.clearCookie('currentUser');
+            //return res.status(401).json({ error: "Token expirado. Por favor, actualize la pagina e inicie sesión de nuevo." });
+            alert("Token expirado. Por favor, actualize la pagina e inicie sesión de nuevo.");
+            return res.redirect("/login");
+        } else {
+            console.log("Error al verificar el token: ", error.message);
+            return res.status(401).json({ error: "Token inválido. Acceso no autorizado." });
+        }
+    }
+
+    let titulo = `Bienvenido \r\n\r\n Perfil`;
+
+    let usuario = req.user;
+
+    if (req.contador) {
+        req.contador++;
+        titulo += ` Visita ${req.contador}`
+    } else {
+        req.contador = 1;
+        titulo += ` Visita ${req.contador}`
+    }
+
+    res.setHeader('Content-type', 'text/html');
+    res.status(200).render("profile", { titulo, usuario, isLogin: req.user });
 });
 
 router.get("/resetpassword", (req, res) => {
     let titulo = `Bienvenido`;
-   
+
     res.setHeader('Content-type', 'text/html');
     res.status(200).render("resetpassword", { titulo });
 });
@@ -201,16 +227,15 @@ router.get('/carts/:cid', async (req, res) => {
 })
 
 //4. EndPoint para vista productos
-router.get('/products', authMiddleware, async (req, res) => {
+router.get('/products', passport.authenticate("current", { session: false }), async (req, res) => {
 
     let prodss;
     let dataObject = {};
     let cSort = {};
 
-    let usersession = req.session.user;
+    let usersession = req.user;
 
-    let titulo = `Bienvenido ${req.session.user.role} ${req.session.user.first_name} ${req.session.user.last_name} (${req.session.user.email}). Listado de Productos`;
-    console.log(titulo);
+    let titulo = `Bienvenido ${req.user.role} ${req.user.first_name} ${req.user.last_name} (${req.user.email}). Listado de Productos`;
 
     let { page, limit, sort, query, type } = req.query;
 
@@ -220,7 +245,6 @@ router.get('/products', authMiddleware, async (req, res) => {
             status: 'error',
             message: 'Tipo de búsqueda inválido.'
         };
-        //console.log(`${dataObject.status}: ${dataObject.message} `);
 
         // Retornar un error 400 (Bad Request) indicando que el tipo no es valido
         res.setHeader('Content-type', 'application/json');
@@ -352,7 +376,7 @@ router.get('/products', authMiddleware, async (req, res) => {
         titulo,
         products: prodss.docs,
         dataObject,
-        isLogin: req.session.user
+        isLogin: req.user
     });
 })
 
@@ -363,9 +387,9 @@ router.get('/realtimeproducts', authMiddleware, async (req, res) => {
     let dataObject = {};
     let cSort = {};
 
-    let usersession = req.session.user;
+    let usersession = req.user;
 
-    let titulo = `Bienvenido ${req.session.user.role} ${req.session.user.first_name} ${req.session.user.last_name} (${req.session.user.email}). Listado de Productos en tiempo Real`;
+    let titulo = `Bienvenido ${req.user.role} ${req.user.first_name} ${req.user.last_name} (${req.user.email}). Listado de Productos en tiempo Real`;
 
     let { page, limit, sort, query, type } = req.query;
 
@@ -507,7 +531,7 @@ router.get('/realtimeproducts', authMiddleware, async (req, res) => {
         titulo,
         products: prodss.docs,
         dataObject,
-        isLogin: req.session.user
+        isLogin: req.user
     });
 });
 

@@ -121,7 +121,6 @@ function ViewCart() {
 function ViewProduct(pid) {
     // Redirigir a la página del carrito
     window.location.href = `/products/${pid}`;
-    console.log("/Products78");
 }
 
 // Funcion para validar MongoDB id, usando expresion regular

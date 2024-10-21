@@ -1,53 +1,45 @@
+const jwt = require("jsonwebtoken");
+const { config } = require("../config/config");
+
 const authMiddleware = (req, res, next) => {
 
-    console.log("auth")
-
-    url = req.url;
-    console.log("url solicitante:", url);
-
+    let url = req.url;
     let { web } = req.query;
 
-    if (!req.session.user) {
+    if (!req.cookies.currentUser) {
 
-        console.log("Sin sesion creada")
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(401).json({ error: `Credenciales No autorizadas. Sin token` });
+    }
 
-        if (web) {
-            console.log("Redireccionando con param web...");
+    let token = req.cookies.currentUser;
 
-            return res.redirect("/login?mensaje=Sin Usuario Autenticado");
+    try {
+
+        let usuario = jwt.verify(token, config.JWT_SECRET);
+        req.user = usuario;
+
+        // Todos redireccionan a /products pero solo role: "admin" tiene permisos para /realtimeproducts
+        if (req.user.role != "admin") {
+
+            if (url.includes("/realtimeproducts")) {
+                return res.redirect("/products");
+            }
+        }
+
+    } catch (error) {
+        if (error.name === "TokenExpiredError") {
+            res.clearCookie('currentUser');
+            return res.status(401).json({ error: "Token expirado. Por favor, actualize la pagina e inicie sesión de nuevo." });
         } else {
-            console.log("Mostrando msj sin param web");
+            console.log("Error al verificar el token: ", error.message);
+
             res.setHeader('Content-Type', 'application/json');
-            return res.status(401).json({ error: `No hay usuarios autenticados.` });
+            return res.status(401).json({ error: `Credenciales No autorizadas.`, detalle: error.message });
         }
     }
-
-    if (req.session.user.role != "admin") {
-        console.log("Con sesion creada")
-        console.log("Sin permisos de rol admin")
-
-        if (url.includes("/realtimeproducts")) {
-            console.log("Redireccionando a products");
-            return res.redirect("/products");
-        }
-    }
-
-
-    /*
-        let { email, password } = req.query;
-        if (!email || !password || email != "admin@coder.com" || password != "123") {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(401).json({ error: `Credenciales Invalidas.` });
-        }
-    */
-
-
 
     return next();
 }
 
 module.exports = authMiddleware;
-
-// import {authMiddleware} ftom './middlewares/authMiddleware.js';
-// app.post("/api/heroes", authMiddleware (req, res) =>{});
-//http://localhost:8080/api/heroes?email=admin@coder.com&password=123
