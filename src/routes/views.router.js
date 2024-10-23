@@ -150,7 +150,7 @@ router.get("/resetpassword", (req, res) => {
 
 
 //2. EndPoint para vista de producto en /products
-router.get('/products/:pid', async (req, res) => {
+router.get('/products/:pid', passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }), async (req, res) => {
 
     const { pid } = req.params;
     if (!isValidObjectId(pid)) {

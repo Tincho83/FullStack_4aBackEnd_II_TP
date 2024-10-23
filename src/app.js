@@ -43,25 +43,9 @@ app.use(logMiddleware);
 let ruta = join(__dirname, "public");
 app.use(express.static(ruta));
 
-
-app.use(sessions({
-    secret: config.ExpressSessions_SECRET,
-    resave: true, // cookie: { secure: false }, // Cambiar a true si se usa https    
-    saveUninitialized: true,
-    //store: new fileStore({ path: config.PATH_STOSESS, ttl:830, retries: 0}) //Persistencia en FS
-    store: MongoStore.create({
-        mongoUrl: config.MONGO_URL,
-        dbName: config.MONGO_DBNAME,
-        ttl: 830,
-    })
-}));
-
-
 //Paso 2:
 initPassport();
 app.use(passport.initialize());
-//app.use(passport.session()); //SOlo si uso sessions
-
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');

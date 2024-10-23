@@ -6,6 +6,8 @@ const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB.js");
 const ProductsManager = require("../dao/filesystem/ProductsManager.js");
 const { CartsModel } = require("../dao/models/CartsModel.js");
 const { ProductsModel } = require("../dao/models/ProductsModel.js");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
 const router = Router();
 
@@ -81,7 +83,7 @@ router.post('/', async (req, res) => {
 })
 
 //4.Agregar producto al carrito
-router.post("/:cid/product/:pid", async (req, res) => {
+router.post("/:cid/product/:pid", passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }), async (req, res) => {
 
     let { cid, pid } = req.params;
 

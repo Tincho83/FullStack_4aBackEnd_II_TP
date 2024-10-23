@@ -47,21 +47,31 @@ router.get('/logout', async (req, res) => {
 
     res.clearCookie('currentUser');
 
-    req.session.destroy(error => {
-        if (error) {
-            res.setHeader('Content-type', 'application/json');
-            return res.status(500).json({
-                error: `Error inesperado en el servidor, no se pudo realizar cierre de sesion.`,
-                detalle: `${error.message}`
-            });
-        }
-        if (web) {
-            return res.redirect("/login?mensaje=Logout Success.")
-        } else {
-            res.setHeader('Content-type', 'application/json');
-            return res.status(200).json({ payload: "Logout Success" });
-        }
-    })
+    /*
+        req.session.destroy(error => {
+            if (error) {
+                res.setHeader('Content-type', 'application/json');
+                return res.status(500).json({
+                    error: `Error inesperado en el servidor, no se pudo realizar cierre de sesion.`,
+                    detalle: `${error.message}`
+                });
+            }    
+    
+            if (web) {
+                return res.redirect("/login?mensaje=Logout Success.")
+            } else {
+                res.setHeader('Content-type', 'application/json');
+                return res.status(200).json({ payload: "Logout Success" });
+            }
+        })
+        */
+
+    if (web) {
+        return res.redirect("/login?mensaje=Logout Success.")
+    } else {
+        res.setHeader('Content-type', 'application/json');
+        return res.status(200).json({ payload: "Logout Success" });
+    }
 
 });
 
@@ -138,7 +148,7 @@ router.get("/current",
     (req, res) => {
         try {
             res.setHeader('Content-type', 'application/json');
-            return res.status(200).json({ user: req.user });
+            return res.status(200).json({ user: req.user, message: 'User Ok.', });
         } catch (error) {
             console.error("Error en el endpoint /current:", error);
 

@@ -7,18 +7,6 @@ const { config } = require("./config");
 const passportJWT = require("passport-jwt");
 const jwt = require("jsonwebtoken");
 
-/*
-BackEndIIpassportgithub
-http://localhost:8080
-http://localhost:8080/api/sessions/callbackGithub
-Owned by:	@Tincho83
-App ID:		1021894
-Using your App ID to get installation tokens? You can now use your Client ID instead.
-Client ID:	Iv23lio4Na64NA4Q6u86
-Public link:	https://github.com/apps/backendiipassportgithub
-Client secrets:	f7a7e78ba138695c859771052a19c3d1baf01a2f
-*/
-
 const cookieExtractor = req => {
     let token = null;
 
@@ -148,10 +136,11 @@ const initPassport = () => {
                     if(user.role==="admin"){
                         return done(null, false, {message:"Ha ingresado como Administrador."})
                     }
-                    if(!user){
-                        return done(null, false, {message:"Usuario no encontrado."})
-                    }
                     */
+                    if (!user) {
+                        return done(null, false, { message: "Usuario no encontrado." })
+                    }
+
                     return done(null, user);
                 } catch (error) {
                     return done(error);
@@ -160,18 +149,6 @@ const initPassport = () => {
         )
     )
 
-
-
-    // Paso 1b: Solo si uso session. no si se usa JWT
-    passport.serializeUser((user, done) => {        
-        //return done(null, user._id);
-        return done(null, user);
-    });
-
-    passport.deserializeUser(async (id, done) => {
-        let user = await UsersManagerMongoDB.getUsersByDBMongo({ _id: id });        
-        return done(null, user);
-    });
 }
 
 module.exports = { initPassport };
