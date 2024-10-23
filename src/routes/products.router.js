@@ -4,6 +4,9 @@ const ProductsManager = require("../dao/filesystem/ProductsManager.js");
 const ProductsManagerMongoDB = require("../dao/db/ProductsManagerMongoDB");
 const { ProductsModel } = require("../dao/models/ProductsModel.js");
 const authMiddleware = require("../middlewares/authMiddleware.js");
+const passportJWT = require("passport-jwt");
+const jwt = require("jsonwebtoken");
+const passport = require("passport");
 
 const router = Router();
 
@@ -12,7 +15,7 @@ const router = Router();
 //EndPopints para el manejo de products
 
 // 1.Obtener todos los productos
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', passport.authenticate("current", { session: false }), async (req, res) => {
 
     let prodss;
     let dataObject = {};

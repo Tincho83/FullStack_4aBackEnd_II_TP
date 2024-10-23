@@ -135,7 +135,7 @@ const initPassport = () => {
         )
     );
 
-    //cookieExtractor
+    //cookieExtractor 
     passport.use("current",
         new passportJWT.Strategy(
             {

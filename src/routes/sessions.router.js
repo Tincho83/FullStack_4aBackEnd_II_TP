@@ -37,8 +37,8 @@ router.post("/login",
 
         res.cookie("currentUser", token, { httpOnly: true });
 
-        res.setHeader('Content-type', 'application/json');        
-        return res.status(201).json({ payload: `Login Ok para ${req.user.first_name} ${JSON.stringify(req.user)}`, existe });
+        res.setHeader('Content-type', 'application/json');
+        return res.status(201).json({ payload: `Login Ok para ${req.user.first_name}: ${JSON.stringify(req.user)} token: ${token}`, existe });
     });
 
 router.get('/logout', async (req, res) => {
@@ -114,7 +114,7 @@ router.get("/callbackGithub",
     (req, res) => {
 
         let user = req.user;
-        delete user.profileGithub._raw; 
+        delete user.profileGithub._raw;
 
         let token = jwt.sign(user, config.JWT_SECRET, { expiresIn: 300 }); //exp 5min
 
@@ -122,21 +122,32 @@ router.get("/callbackGithub",
             return res.status(500).json({ error: "Token no encontrado." });
         }
 
-      
+
         try {
             res.cookie("currentUser", encodeURIComponent(token), { httpOnly: true });
         } catch (error) {
             console.log("creando currentUser: error: ", error);
         }
 
-           return res.redirect("/profile");
+        return res.redirect("/profile");
 
     });
 
-    router.get("/current",
-    passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }), 
-    (req, res) => {     
+router.get("/current",
+    passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }),
+    (req, res) => {
+        try {
+            res.setHeader('Content-type', 'application/json');
+            return res.status(200).json({ user: req.user });
+        } catch (error) {
+            console.error("Error en el endpoint /current:", error);
 
+            res.setHeader('Content-type', 'application/json');
+            return res.status(500).json({
+                error: "Error inesperado en el servidor.",
+                detalle: error.message
+            });
+        }
     });
 
 module.exports = { router };

@@ -96,7 +96,9 @@ router.get("/login", (req, res) => {
     res.status(200).render("login", { titulo, isLogin: req.user });
 });
 
-router.get("/profile", passport.authenticate("current", { session: false }), (req, res) => {
+router.get("/profile", passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }), (req, res) => {
+
+    let usuario;
 
     // Verificar si existe la cookie con el token JWT
     if (!req.cookies.currentUser) {
@@ -104,8 +106,10 @@ router.get("/profile", passport.authenticate("current", { session: false }), (re
     }
 
     try {
-        let usuario = jwt.verify(req.cookies.currentUser, config.JWT_SECRET);
-        req.user = usuario;
+        //let usuario = jwt.verify(req.cookies.currentUser, config.JWT_SECRET);
+        //req.user = usuario;
+        usuario = req.user;
+        //console.log (usuario);
     } catch (error) {
         if (error.name === "TokenExpiredError") {
 
@@ -121,7 +125,7 @@ router.get("/profile", passport.authenticate("current", { session: false }), (re
 
     let titulo = `Bienvenido \r\n\r\n Perfil`;
 
-    let usuario = req.user;
+
 
     if (req.contador) {
         req.contador++;
@@ -534,6 +538,23 @@ router.get('/realtimeproducts', authMiddleware, async (req, res) => {
         isLogin: req.user
     });
 });
+
+router.get("/current",
+    passport.authenticate("current", { session: false, failureRedirect: "/api/sessions/error" }),
+    (req, res) => {
+        try {
+            res.setHeader('Content-type', 'application/json');
+            return res.status(200).json({ user: req.user });
+        } catch (error) {
+            console.error("Error en el endpoint /current:", error);
+
+            res.setHeader('Content-type', 'application/json');
+            return res.status(500).json({
+                error: "Error inesperado en el servidor.",
+                detalle: error.message
+            });
+        }
+    });
 
 
 module.exports = { router };

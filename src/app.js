@@ -43,6 +43,7 @@ app.use(logMiddleware);
 let ruta = join(__dirname, "public");
 app.use(express.static(ruta));
 
+
 app.use(sessions({
     secret: config.ExpressSessions_SECRET,
     resave: true, // cookie: { secure: false }, // Cambiar a true si se usa https    
@@ -54,6 +55,8 @@ app.use(sessions({
         ttl: 830,
     })
 }));
+
+
 //Paso 2:
 initPassport();
 app.use(passport.initialize());
@@ -84,6 +87,11 @@ app.use("/", (req, res, next) => {
     next();
 }, viewsRouter);
 
+let servername = process.env.COMPUTERNAME;
+let nodeversion = process.version;
+let modversion = process.versions;
+let pid = process.pid;
+
 const serverHTTP = app.listen(PORT, () => console.log(`
 
 ***************************************                                    
@@ -92,6 +100,12 @@ const serverHTTP = app.listen(PORT, () => console.log(`
 
 # Url:
     http://localhost:${PORT}
+
+
+# Iniciado en el servidor: ${servername}
+# con el proceso Id: ${pid}
+# usando version de NodeJS: ${nodeversion}
+# Nombre y Version de Modulos: ${JSON.stringify(modversion, null, 5)}
 
 `));
 

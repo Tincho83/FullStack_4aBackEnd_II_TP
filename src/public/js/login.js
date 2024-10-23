@@ -3,6 +3,7 @@ const cargarDatosToken = async () => {
     });
 
     if (respuestatoken.status >= 400) {
+        alert("Error al cargar los productos.");
         alert(respuestatoken.statusText);
     } else {
         let datos = await respuestatoken.json();
@@ -25,6 +26,7 @@ if (mensaje) {
 }
 
 btnLoginGitHub.addEventListener("click", async (event) => {
+    btnLoginGitHub.disabled = true;
     window.location.href = `/api/sessions/github`;
 })
 
